@@ -1,5 +1,5 @@
-Local Storage Cache
-===================
+HTML5 Caching
+=============
 A localStroage wrapper that creates a nice way to cache data.
 
 How To Use
