@@ -37,7 +37,7 @@
 		},
 		
 		/**
-		 * Remove all data from the cache.
+		 * Clear
 		 * 
 		 * @return Returns true if cache is cleared, false if not.
 		 */
@@ -57,7 +57,7 @@
 		},
 		
 		/**
-		 * Returns whether or not cache is enabled.
+		 * Is Enabled
 		 * 
 		 * @return True if cache is enabled, false if not.
 		 */
@@ -74,7 +74,7 @@
 		},
 		
 		/**
-		 * Returns whether or not smart caching is on or off.
+		 * Is Smart
 		 * 
 		 * @return True if smart caching is on, false if not.
 		 */
@@ -91,7 +91,7 @@
 		},
 		
 		/**
-		 * Loads data from cache.
+		 * Load
 		 * 
 		 * @param id The ID of the cache block to load from.
 		 * @param key The address in the block to load data from.
@@ -125,7 +125,7 @@
 		},
 		
 		/**
-		 * Saves data to the cache.
+		 * Save
 		 * 
 		 * @param id The ID of the cache block to save data to.
 		 * @param key The address in the block to save data to.
@@ -158,7 +158,7 @@
 		},
 		
 		/**
-		 * Turns caching on/off (default on).
+		 * Set Enabled
 		 * 
 		 * @param bool True to turn caching on, false to turn it off.
 		 */
@@ -172,7 +172,7 @@
 		},
 		
 		/**
-		 * Turns smart caching on/off (default on).
+		 * Set Smart
 		 * 
 		 * @param bool True to turn smart caching on, false to turn it off.
 		 */
