@@ -1,6 +1,6 @@
 /*
- * Local Storage Cache
- * <https://github.com/jjNford/localstorage-cache>
+ * HTML5 Caching
+ * <https://github.com/jjNford/html5-caching>
  * 
  * Copyright (C) 2012, JJ Ford (jj.n.ford@gmail.com)
  * 
