@@ -27,7 +27,7 @@
 	
 	window.Cache = {
 		
-		_ttl: 1,//900000, // 15 minutes
+		_ttl: 900000, // 15 minutes
 		
 		_key: "cache.",
 		_enabled: "pref.cen",
