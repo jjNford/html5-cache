@@ -1,177 +1,139 @@
-/*
- * HTML5 Caching
- * <https://github.com/jjNford/html5-caching>
- * 
- * Copyright (C) 2012, JJ Ford (jj.n.ford@gmail.com)
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- */
 (function() {
-	
-	window.Cache = {
-		
-		init: function() {
-			this.TTL = 900000; // 15 minutes
-			this.KEY = "cache.";
-			this.ENABLED = "pref.cen";
-			this.SMART = "pref.csm";
-			this.THRESHOLD = 1;
-			this.NAME = "Cache";
-		},
-		
-		/**
-		 * @return Returns true if cache is cleared, false if not.
-		 */
-		clear: function() {
-			try {
-				for(var i = window['localStorage'].length - 1; i >= 0; i--) {
-					var temp = window['localStorage'].key(i);
-					if(new RegExp(this.KEY).test(temp)) {
-						delete window['localStorage'][temp];
-					}
-				}
-				return true;
-			}
-			catch(error) {
-				return false;
-			}
-		},
-		
-		/**
-		 * @return True if cache is enabled, false if not.
-		 */
-		isEnabled: function() {
-			if(window['localStorage'] !== null) {
-				try {
-					return JSON.parse(window['localStorage'][this.ENABLED]);
-				}
-				catch(error) {
-					return true;
-				}
-			}
-			return false;
-		},
-		
-		/**
-		 * @return True if smart caching is on, false if not.
-		 */
-		isSmart: function() {
-			if(this.isEnabled() === true) {
-				try {
-					return window['localStorage'][this.SMART];
-				}
-				catch(error) {
-					return true;
-				}
-			}
-			return false;
-		},
-		
-		/**
-		 * @param id The ID of the cache block to load from.
-		 * @param key The address in the block to load data from.
-		 * @return If smart caching is turned on, cached data object {expired: <>, data: <>}, null 
-		 *         if no data found. If smart caching is turned off and cache has expired null is 
-		 *         returned.
-		 */
-		load: function(id, address) {
-			if(this.isEnabled() === true) {
-				try {
-					var payload = JSON.parse(window['localStorage'][this.KEY + id])[address];
-					var timestamp = new Date().getTime();
-					var expired = false;
-					
-					if(payload != null) {
-						if(timestamp - payload.time > this.TTL) {
-							if(this.isSmart() === false) {
-								return null;
-							}
-							expired = true;
-						}
-						return {data: payload.data, expired: expired};
-					}
-					return null;
-				}
-				catch(error) {
-					return null;
-				}
-			}
-			return null;
-		},
-		
-		/**
-		 * @param id The ID of the cache block to save data to.
-		 * @param key The address in the block to save data to.
-		 * @param The data to cache.
-		 * @return True if the data is cached, false if not.
-		 */
-		save: function(id, address, data, _missed) {
-			if(this.isEnabled() === true) {
-				try {
-					if(!_missed || _missed <= this.THRESHOLD) {						
-						var block = JSON.parse(window['localStorage'][this.KEY + id]);
-						var timestamp = new Date().getTime();
-						block[address] = {"time": timestamp, "data": data};
-						window['localStorage'][this.KEY + id] = JSON.stringify(block);
-						return true;
-					}
-					else {
-						return false;
-					}
-				}
-				catch (error) {
-					if(!_missed) {
-						_missed = 0;
-					}
-					window['localStorage'][this.KEY + id] = "{}";
-					return this.save(id, address, data, ++_missed);
-				}
-			}
-			return false;
-		},
-		
-		/**
-		 * @param bool True to turn caching on, false to turn it off.
-		 */
-		setEnabled: function(bool) {
-			if(bool === true || bool === false) {
-				try {
-					window['localStorage'][this.ENABLED] = bool;
-				}
-				catch(error) {}
-			}
-		},
-		
-		/**
-		 * @param bool True to turn smart caching on, false to turn it off.
-		 */
-		setSmart: function(bool) {
-			if(bool === true || bool === false) {
-				try {
-					window['localStorage'][this.SMART] = bool;
-				}
-				catch(error) {}
-			}
-		}
-	};
-	
-	Cache.init();
-	
+    window.cache = {
+
+        ttl: "900000",
+        key: "cache.",
+        key_ttl: "pref.cttl",
+        key_smart: "pref.csmart",
+        key_enabled: "pref.cenabled",
+
+        /**
+         * Clears the cache. Settings will still be saved.
+         */
+        clear: function() {
+            for (var i = window.localStorage.length - 1; i >= 0; i--) {
+                var key = window.localStorage.key(i);
+                if (new RegExp(this.key).test(key)) {
+                    window.localStorage.removeItem(key);
+                }
+            }
+        },
+        
+        /**
+         * Retrieves that data saved from cache under the given key. 
+         * The data is returned in an object with the time it was saved,
+         * if its cache was expired (smart caching), and what the current
+         * value of the data's time to live is.
+         *
+         * @param key Key data is stored under to return.
+         * @return Object containing data, if expired, saved time, and time to live.
+         */
+        getItem: function(key) {
+            if (this.isEnabled() == "true") {
+                var block = JSON.parse(window.localStorage.getItem(this.key + key));
+                if (block === null) {
+                    return null;
+                } else {
+                    var currentTime = new Date().getTime();
+                    var currentTtl = currentTime - block.time;
+                    var expired = false;
+
+                    if (currentTtl > this.ttl) {
+                        if(this.isSmart() == "false") {
+                            return null;
+                        }
+                        currentTtl = 0;
+                        expired = true;
+                    }
+                    return {data: block.data, expired: expired, time: block.time, ttl: currentTtl};
+                }
+            }
+            return null;
+        },
+
+        /**
+         * Determines if the cache is enabled.
+         *
+         * @return True if the cache is enabled, false if not.
+         */
+        isEnabled: function() {
+            return window.localStorage.getItem(this.key_enabled);
+        },
+        
+        /**
+         * Determines if the cache is smart. Smart caching returns expired cache values.
+         *
+         * @return True if the cache is smart, false if not.
+         */
+        isSmart: function() {
+            return window.localStorage.getItem(this.key_smart);
+        },
+        
+        /**
+         * Removes an item from the cache.
+         *
+         * @param Key data is stored under that needs removed from cache.
+         */
+        removeItem: function(key) {
+            window.localStorage.removeItem(this.key + key);
+        },
+
+        /**
+         * Switches the cache on and off. If the cache is disabled all data
+         * stored in the cache will be deleted.
+         *
+         * @param enabled True to enable caching, false to disable it.
+         */
+        setEnabled: function(enabled) {
+            window.localStorage.setItem(this.key_enabled, enabled);
+            this.clear();
+        },
+        
+        /**
+         * Save the given data under the given key in the cache.
+         *
+         * @param key Key to save data under in the cache.
+         * @param data Data to save to the cache.
+         */
+        setItem: function(key, data) {
+            if (this.isEnabled() == "true") {
+                window.localStorage.setItem(this.key + key, JSON.stringify({
+                    "data": data,
+                    "time": new Date().getTime()
+                }));
+            }
+        },
+
+        /**
+         * Switches smart caching on and off.
+         *
+         * @param enabled True to enable smart caching, false to disable it.
+         */
+        setSmart: function(enabled) {
+            window.localStorage.setItem(this.key_smart, enabled);
+        },
+
+        /**
+         * Sets the time to live for each item that is put in the cache.
+         *
+         * @param ttl Cache items time to live.
+         */
+        setTtl: function(ttl) {
+            this.ttl = ttl;
+            window.localStorage.setItem(this.key_ttl, ttl);
+        }
+    };
+
+    // Initialize the cache.
+    if (window.cache.isEnabled() === null) {
+        window.cache.setEnabled(false);
+    }
+    if (window.cache.isSmart() === null) {
+        window.cache.setSmart(false);
+    }
+    if (window.localStorage.getItem(window.cache.key_ttl) === null) {
+        window.localStorage.setItem(window.cache.key_ttl, window.cache.ttl);
+    } else {
+        window.cache.ttl = window.localStorage.getItem(window.cache.key_ttl);
+    }
 })();

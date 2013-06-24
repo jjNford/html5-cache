@@ -1,92 +1,114 @@
-HTML5 Caching
-=============
-A localStroage wrapper that creates a nice way to cache data.
+HTML5 Cache
+===========
+A local storage wrapper that acts as a time to live cache.
 
 How To Use
 ----------
-Just include cache.js into your project and access the API using the Cache DOM element. Example:
+1. Include the cache script in your project:
 
-    Cache.save(22, "alpha", {x: 33, y: 31});
+	```html
+	<html>
+	...
+	...
+	<body>
+		...
+		...
+		
+		<script src="libs/html5-cache/cache.js"></script>
+		
+		...
+		...
+	</body>
+	</html>
+	```
+
+2. Use `window.cache` to access the cache:
+
+	```javascript
+	window.cache.setEnabled(true);
+	window.cache.setSmart(true);
+	window.cache.setTtl(10000);
+
+	var data = requestDataFromApi();
+	window.cache.setItem("api_data", data);
+	...
+	...
+	...
+	
+	data = window.cache.getItem("api_data");
+
+	if(data.data == null || data.expired == "true") {
+		data = requestDataFromApi();
+	}
+	...	
+	...
+	...
+	```
+	
+	If smart caching is enabled, expired data will be returned with `data.expired = true`. If smart caching is disabled, then null will be returned if the time to live (ttl) has expired.
+
+3. Include attribution to library.
 
 API
 ---
 
-Default Settings:
-
-* Cache TTL: 15 minutes
-* Cache Enabled: true
-* Smart Caching: true
-* Threshhold (cache misses when saving): 1
-
-**NOTE**: localStorage support is required to use caching
+>**clear()**
+><br><br>
+>Clears the cache.
 
 ---
 
-> **clear()** <br/><br/>
-`Return - True if cache is cleared, false if not.`
-
-Clears the content of the cache.
-
----
-
-> **isEnabled()** <br/><br/>
-`Return - True if the cache is enabled, false if not.`
-
-Determine if caching is enabled.
-
----
-
-> **isSmart()** <br/><br/>
-`Return - True if cache is smart, false if not.`
-
-Determin if caching is smart.  Smart cache will returned expired cache as buffer, if smart caching is off, expired data is returned as null.
+>**getItem(key)**
+><br><br>
+>Retrieves an item from the cache.
+><br><br>
+>```
+>{
+>	"data": data
+>	"expired": true|false
+>	"time": time-cached
+>	"ttl": time-to-live
+>}
+>```
 
 ---
 
-> **load( id, address )** <br/><br/>
-`Parameter - id - The ID of the cache block to load from.`
-`Parameter - address - The address in the cache block to load from.`
-`Return - If cached data is found a cached data object will be returned, else null.`
-`Cached Data Object = {expired: <true/false>, data: <cached_data>}`
-    
-Loads data from the cache.  If smart caching is enabled:
-
-* If data is found a cached data object is returned always.
-* If no data is found null is returned.
-
-If smart caching is disabled:
-
-* If data is found and cache has not expired the data is returned.
-* If the data has expired or is not found null is returned.
-
-If caching is disabled, null is always returned.
+>**isEnabled()**
+><br><br>
+>Determines if the cache is enabled.
 
 ---
 
-> **save( id, address, data  )** <br/><br/>
-`Parameter - id - The ID of the cache black to save to.`
-`Parameter - address - The address in the cache block to save to.`
-`Parameter - data - The data to cache.`
-`Return - True if the data is cached, false if not`
-
-Caches data.
+>**isSmart()**
+><br><br>
+>Determines if the cache is smart.
 
 ---
 
-> **setEnabled( bool )** <br/><br/>
-`Parameter - bool - True to enable cache, false to disable.`
-
-Enables/Disables cache.
-
----
-
-> **setSmart( bool )** <br/><br/>
-`Parameter - bool - True to enable smart caching, false to disable.`
-
-Enables/Disables smart caching.
+>**removeItem(key)**
+><br><br>
+>Removes the data with the given key from the cache.
 
 ---
 
-License
--------
-- [MIT](http://www.opensource.org/licenses/mit-license.php)
+>**setEnabled(key)**
+><br><br>
+>Enable or disable the cache.
+
+---
+
+>**setItem(key, data)**
+><br><br>
+>Saves the given data under the given key to the cache.
+
+---
+
+>**setSmart(enabled)**
+><br><br>
+>Enables or disables the cache.
+
+---
+
+>**setTtl(ttl)**
+><br><br>
+>Sets the time to live for items saved to the cache.
