@@ -56,7 +56,7 @@ API
 ><br><br>
 >Clears the cache.
 
----
+--
 
 >**getItem(key)**
 ><br><br>
@@ -71,43 +71,43 @@ API
 >}
 >```
 
----
+--
 
 >**isEnabled()**
 ><br><br>
 >Determines if the cache is enabled.
 
----
+--
 
 >**isSmart()**
 ><br><br>
 >Determines if the cache is smart.
 
----
+--
 
 >**removeItem(key)**
 ><br><br>
 >Removes the data with the given key from the cache.
 
----
+--
 
 >**setEnabled(key)**
 ><br><br>
 >Enable or disable the cache.
 
----
+--
 
 >**setItem(key, data)**
 ><br><br>
 >Saves the given data under the given key to the cache.
 
----
+--
 
 >**setSmart(enabled)**
 ><br><br>
 >Enables or disables the cache.
 
----
+--
 
 >**setTtl(ttl)**
 ><br><br>
